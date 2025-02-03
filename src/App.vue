@@ -45,14 +45,15 @@ export default {
       <div class="brand flex items-center text-2xl ml-2 mt-4">AiCадовод</div>
     </div>
     <nav class="menu flex items-center text-xl ml-auto mt-4">
-      <router-link :to="'/home'">Главная</router-link>
-      <router-link :to="'/garden'" class="ml-8">Мой сад</router-link>
-      <router-link :to="'/profile'" class="ml-8 mr-6">Профиль</router-link>
+      <router-link to="/home">Главная</router-link>
+      <router-link to="/garden" class="ml-8">Мой сад</router-link>
+      <router-link to="/profile" class="ml-8 mr-6">Профиль</router-link>
     </nav>
   </header>
 
   <RouterView />
 </template>
+
 
 <style>
 * {
@@ -66,24 +67,23 @@ header {
   border-bottom: 0.1rem solid #e5e7eb;
 }
 
-button {
-  background-color: #57cfa7;
+a {
+  text-decoration: none !important;
+  color: #57cfa7 !important;
 }
 
-button:hover {
-  background-color: #3d9477;
+.router-link-active, .router-link-exact-active {
+  color: #45a887 !important;
+  font-weight: bold !important;
+  border-bottom: 0.2rem solid #45a887 !important;
+  text-decoration: none;
 }
 
-
-router-link:hover{
-  color: #45a887;
-  border-bottom: 0.4rem solid #45a887;
+.router-link:hover {
+  color: #45a887 !important;
+  text-decoration: none !important;
 }
 
-router-link:active{
-  color: #45a887;
-  border-bottom: 0.2rem solid #45a887;
-}
 
 .logo {
   height: 4.2rem;
@@ -99,26 +99,5 @@ router-link:active{
   font-weight: bold;
 }
 
-.main-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
-}
 
-.text-upload {
-  flex: 1;
-}
-
-.image-section {
-  flex: 1;
-}
-
-.main-image {
-  max-width: 100%;
-  height: auto;
-  border-radius: 1rem;
-}
-.upload-section {
-  height: 20rem;
-}
 </style>

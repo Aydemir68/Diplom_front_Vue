@@ -13,7 +13,7 @@
 
           <!-- Upload Section -->
           <div class="upload-section border-dashed border-2 border-gray-300 border-round-2xl p-6 text-center">
-            <p class="text-gray-500 mb-4 mt-8">Перетащите изображение</p>
+            <p class="text-gray-500 text-xl mb-4 mt-8">Перетащите изображение</p>
             <input
               type="file"
               accept="image/*"
@@ -57,28 +57,14 @@ export default {
 </script>
 
 <style scoped>
-header {
-  background-color: #ffffff;
-  border-bottom: 0.1rem solid #e5e7eb;
-}
 
 button {
   background-color: #57cfa7;
+  font-size: medium;
 }
 
 button:hover {
   background-color: #3d9477;
-}
-
-
-router-link:hover{
-  color: #45a887;
-  border-bottom: 0.2rem solid #45a887;
-}
-
-router-link:active{
-  color: #45a887;
-  border-bottom: 0.2rem solid #45a887;
 }
 
 .logo {
