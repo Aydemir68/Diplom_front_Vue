@@ -106,24 +106,38 @@ export default {
     async uploadImages(event, gardenId) {
       const files = event.target.files;
       if (!files.length) return;
-      
+
       const garden = this.gardens.find(g => g.id === gardenId);
       if (!garden) return;
-      
+
+      const formData = new FormData();
+      formData.append("name", garden.name);
+      formData.append("location", garden.location);
       for (const file of files) {
-        const imageUrl = URL.createObjectURL(file);
-        garden.images.push(imageUrl);
+        formData.append("images", file);
       }
-      
-      this.saveToLocalStorage();
-      await this.updateGardenStats(gardenId);
+
+      try {
+        const response = await fetch("http://localhost:8000/gardens", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error("Ошибка загрузки сада");
+
+        const data = await response.json();
+        garden.images = data.images; // Обновляем изображения в саду
+        await this.updateGardenStats(gardenId);
+      } catch (error) {
+        console.error("Ошибка загрузки изображений:", error);
+      }
     },
     async updateGardenStats(gardenId) {
       const garden = this.gardens.find(g => g.id === gardenId);
       if (!garden) return;
       
       try {
-        const response = await fetch("http://localhost:5000/garden-stats", {
+        const response = await fetch("http://localhost:8000/garden-stats", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ images: garden.images }),
