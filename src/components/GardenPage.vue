@@ -64,7 +64,6 @@ export default {
     return {
       gardens: [],
       selectedGardens: [],
-      alertMessage: "",
     };
   },
   created() {
@@ -139,9 +138,43 @@ export default {
           selected: false,
         }))];
         await this.updateGardenStats(gardenId);
+        this.saveToLocalStorage();
       } catch (error) {
         console.error("Ошибка загрузки изображений:", error);
       }
+    },
+    async updateGardenStats(gardenId){
+        const garden = this.gardens.find(g => g.id === gardenId);
+        if(!garden) return;
+
+        let healthy = 0;
+        let diseased = 0;
+
+        for(const image of garden.images){
+            try{
+                const response = await fetch("http://localhost:8000/predict", {
+                    method: "POST",
+                    body: JSON.stringify({ image: image.src }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                if (!response.ok) throw new Error("Ошибка анализа изображения");
+
+                const data = await response.json();
+                if (data.diagnosis === "Здоровое яблоко") {
+                    healthy++;
+                } else {
+                    diseased++;
+                }
+            }
+            catch(error){
+                console.error("Ошибка анализа изображения:", error);
+            }
+        }
+        garden.stats.healthy = healthy;
+        garden.stats.diseased = diseased;
     },
     toggleSelection(image, gardenId) {
       image.selected = !image.selected;
@@ -200,7 +233,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .add-garden-btn, .delete-selected-btn, .save-btn {
