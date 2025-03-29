@@ -80,7 +80,7 @@ export default {
          console.log("Ответ от сервера:", data);
          if (data.diagnosis === 'Поздравляю! Яблоко здоровое') {
            this.result = `${data.diagnosis} с вероятностью ${data.confidence}%.  Никакого лечения не требуется!`;
-         } else if (data.diagnosis === 'Парша' || data.diagnosis === 'Яблонный грибок' || data.diagnosis === 'Яблоко гнилое') {
+         } else if (data.diagnosis === 'Парша' || data.diagnosis === 'Яблонный грибок' || data.diagnosis === 'Яблоко гнилое' || data.diagnosis === 'Кровяная тля' || data.diagnosis === 'Яблонная моль' || data.diagnosis === 'Яблонный цветоед' || data.diagnosis === 'Плодожорка'  ) {
           this.result = `${data.diagnosis} с вероятностью ${data.confidence}%. Возможное лечение: ${data.treatment}`;
          }
          else {
