@@ -57,43 +57,39 @@ export default {
      this.$el.querySelector(".file-input").click();
    },
    async handleFileUpload(event) {
-     const file = event.target.files[0];
-     if (file) {
-       this.imageUrl = URL.createObjectURL(file);
-       this.result = null;
-       this.loading = true;
-       
-       const formData = new FormData();
-       formData.append("file", file);
+  const file = event.target.files[0];
+  if (file) {
+    this.imageUrl = URL.createObjectURL(file);
+    this.result = null;
+    this.loading = true;
 
-       try {
-         const response = await fetch("http://localhost:8000/predict", {
-           method: "POST",
-           body: formData,
-         });
+    const formData = new FormData();
+    formData.append("file", file);
 
-         if (!response.ok) {
-           throw new Error("Ошибка ответа сервера");
-         }
+    try {
+      const response = await fetch("http://localhost:8000/predict", {
+        method: "POST",
+        body: formData,
+      });
 
-         const data = await response.json();
-         console.log("Ответ от сервера:", data);
-         if (data.diagnosis === 'Поздравляю! Яблоко здоровое') {
-           this.result = `${data.diagnosis} с вероятностью ${data.confidence}%.  Никакого лечения не требуется!`;
-         } else if (data.diagnosis === 'Парша' || data.diagnosis === 'Яблонный грибок' || data.diagnosis === 'Яблоко гнилое' || data.diagnosis === 'Кровяная тля' || data.diagnosis === 'Яблонная моль' || data.diagnosis === 'Яблонный цветоед' || data.diagnosis === 'Плодожорка'  ) {
-          this.result = `${data.diagnosis} с вероятностью ${data.confidence}%. Возможное лечение: ${data.treatment}`;
-         }
-         else {
-           this.result = "Не удалось обработать изображение.";
-         }
-       } catch (error) {
-         console.error("Ошибка при отправке файла:", error);
-         this.result = "Ошибка при обработке изображения.";
-       } finally {
-         this.loading = false;
-       }
-     }
-   },
+      console.log("RAW Response:", await response.clone().text()); // Логируем ответ сервера
+
+      if (!response.ok) {
+        throw new Error("Ошибка ответа сервера");
+      }
+
+      const data = await response.json();
+      console.log("Parsed Response:", data);
+
+      this.result = `${data.diagnosis} с вероятностью ${data.confidence}%. ${data.treatment ? "Возможное лечение: " + data.treatment : "Лечение не требуется."}`;
+    } catch (error) {
+      console.error("Ошибка при отправке файла:", error);
+      this.result = "Ошибка при обработке изображения.";
+    } finally {
+      this.loading = false;
+    }
+  }
+  },
  },
 };
 </script>
