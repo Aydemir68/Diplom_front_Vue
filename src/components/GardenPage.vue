@@ -1,6 +1,6 @@
 <template>
   <div class="garden-page p-4">
-    <h1 class="header-garden text-3xl font-bold mb-5 w-full p-1 border-round text-white">Мои сады</h1>
+
 
     <div class="actions flex gap-4 mb-4">
       <button class="add-garden-btn px-4 py-2 text-white border-none border-round" @click="addGarden">
@@ -192,7 +192,7 @@ export default {
       }
 
        try {
-         const response = await fetch("http://localhost:8000/gardens", {
+         const response = await fetch("https://unbearably-decorous-airedale.cloudpub.ru/gardens", {
            method: "POST",
            body: formData,
          });
@@ -202,7 +202,7 @@ export default {
          const data = await response.json();
 
          const newImages = data.images.map(filename => ({
-           src: `http://localhost:8000/images/${encodeURIComponent(filename)}`,
+           src: `https://unbearably-decorous-airedale.cloudpub.ru/images/${encodeURIComponent(filename)}`,
            selected: false,
          }));
 
@@ -236,7 +236,7 @@ export default {
       const imageUrls = selectedImages.map(img => img.src);
 
       try {
-        const response = await fetch("http://localhost:8000/analyze-selected-images", {
+        const response = await fetch("https://unbearably-decorous-airedale.cloudpub.ru/analyze-selected-images", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ images: imageUrls }),

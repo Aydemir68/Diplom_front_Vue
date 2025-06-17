@@ -36,7 +36,7 @@
         password: '',
         errorMessage: '',
         isLoading: false,
-        apiBaseUrl: 'http://localhost:8000' // Замените на ваш URL
+        apiBaseUrl: 'https://unbearably-decorous-airedale.cloudpub.ru' // Замените на ваш URL
       };
     },
     methods: {

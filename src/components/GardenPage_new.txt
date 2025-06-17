@@ -1,0 +1,1107 @@
+<template>
+  <div class="garden-page">
+    <div class="garden-header">
+      <div class="header-content">
+        <h1 class="page-title">Мой сад</h1>
+        <p class="page-subtitle">Управляйте своими садами и анализируйте здоровье растений</p>
+      </div>
+      
+      <div class="header-actions">
+        <button class="add-garden-btn" @click="addGarden">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Добавить сад
+        </button>
+        <button 
+          class="delete-selected-btn" 
+          @click="deleteSelectedGardens" 
+          :disabled="!selectedGardens.length"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6H5H21M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Удалить выбранные
+        </button>
+      </div>
+    </div>
+
+    <div class="gardens-container">
+      <div v-for="garden in gardens" :key="garden.id" class="garden-card" :class="{ 'selected': selectedGardens.includes(garden.id) }">
+        <div class="garden-card-header">
+          <div class="garden-info">
+            <div class="garden-name-section">
+              <input 
+                v-model="garden.name" 
+                class="garden-name-input" 
+                @input="saveToLocalStorage" 
+                :disabled="garden.isAnalyzing"
+                placeholder="Название сада"
+              />
+              <input 
+                v-model="garden.location" 
+                class="garden-location-input" 
+                @input="saveToLocalStorage" 
+                :disabled="garden.isAnalyzing"
+                placeholder="Местоположение"
+              />
+            </div>
+            <div class="garden-status">
+              <span v-if="!garden.saved" class="status-badge unsaved">Не сохранен</span>
+              <span v-else class="status-badge saved">Сохранен</span>
+            </div>
+          </div>
+          
+          <div class="garden-actions">
+            <label class="select-checkbox">
+              <input 
+                type="checkbox" 
+                v-model="selectedGardens" 
+                :value="garden.id" 
+                :disabled="garden.isAnalyzing" 
+              />
+              <span class="checkmark"></span>
+            </label>
+            
+            <button 
+              class="delete-garden-btn" 
+              @click.stop="deleteGarden(garden.id)" 
+              :disabled="garden.isAnalyzing"
+              title="Удалить сад"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H5H21M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            
+            <button 
+              v-if="!garden.saved" 
+              class="save-garden-btn" 
+              @click="saveGarden(garden.id)" 
+              :disabled="garden.isAnalyzing"
+            >
+              Сохранить
+            </button>
+            
+            <button 
+              v-if="garden.saved" 
+              @click="!garden.isAnalyzing && toggleGarden(garden.id)" 
+              class="toggle-garden-btn"
+              :class="{'disabled': garden.isAnalyzing}"
+              :disabled="garden.isAnalyzing"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                :class="{ 'rotated': garden.expanded }"
+              >
+                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="garden.expanded && garden.saved" class="garden-card-content">
+          <div v-if="garden.isAnalyzing" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Анализ изображений...</p>
+          </div>
+
+          <div class="upload-section">
+            <div class="upload-area">
+              <div class="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="#57cfa7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M17 8L12 3L7 8" stroke="#57cfa7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3V15" stroke="#57cfa7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="upload-title">Загрузите изображения растений</h3>
+              <p class="upload-subtitle">Выберите файлы для анализа здоровья растений</p>
+              <input 
+                type="file" 
+                accept="image/*" 
+                multiple 
+                class="hidden" 
+                :ref="'fileInput' + garden.id" 
+                @change="uploadImages($event, garden.id)" 
+                :disabled="garden.isAnalyzing" 
+              />
+              <button 
+                class="upload-btn" 
+                @click="!garden.isAnalyzing && triggerFileInput(garden.id)" 
+                :disabled="garden.isAnalyzing"
+              >
+                Выбрать файлы
+              </button>
+            </div>
+          </div>
+
+          <template v-if="garden.images.length > 0">
+            <div class="images-section">
+              <h3 class="section-title">Загруженные изображения</h3>
+              <div class="image-gallery">
+                <div 
+                  v-for="(image, index) in garden.images" 
+                  :key="index" 
+                  class="image-item"
+                  :class="{'selected': image.selected}"
+                  @click="!garden.isAnalyzing && toggleSelection(image)"
+                >
+                  <img
+                    :src="image.src"
+                    alt="Загруженное изображение"
+                    class="garden-image"
+                    :class="{'disabled': garden.isAnalyzing}"
+                  />
+                  <div v-if="image.selected" class="image-selection-indicator">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="analysis-section">
+                <button
+                  class="analyze-btn"
+                  @click="analyzeSelected(garden.id)"
+                  :disabled="!garden.images.some(img => img.selected) || garden.isAnalyzing"
+                >
+                  <svg v-if="garden.isAnalyzing" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner">
+                    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span v-else>Анализировать выбранные</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="stats-section">
+              <h3 class="section-title">Статистика сада</h3>
+              <div class="stats-card">
+                <div v-if="Object.keys(garden.stats).length > 0" class="stats-content">
+                  <div class="stats-grid">
+                    <div v-for="(count, diagnosis) in garden.stats" :key="diagnosis" class="stat-item">
+                      <span class="stat-label">{{ formatDiagnosisName(diagnosis) }}</span>
+                      <span class="stat-value">{{ count }}</span>
+                    </div>
+                  </div>
+                  <div class="stats-summary">
+                    <div class="summary-item healthy">
+                      <span class="summary-label">Здоровых растений:</span>
+                      <span class="summary-value">{{ calculateTotalHealthy(garden.stats) }}</span>
+                    </div>
+                    <div class="summary-item diseased">
+                      <span class="summary-label">Больных растений:</span>
+                      <span class="summary-value">{{ calculateTotalDiseased(garden.stats) }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="stats-empty">
+                  <p>Статистика пока отсутствует. Проанализируйте изображения для получения данных.</p>
+                </div>
+              </div>
+            </div>
+          </template>
+          
+          <div v-else class="empty-state">
+            <p>Загрузите изображения растений для начала анализа</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      gardens: [],
+      selectedGardens: [], // Для выбора самих садов (для удаления)
+    };
+  },
+  computed: {
+    // Вычисляемые свойства для подсчета итогов
+    calculateTotalHealthy() {
+       // Используем точное имя из маппинга бэкенда
+      const healthyName = "Здоровое яблоко";
+      return (stats) => stats[healthyName] || 0;
+    },
+    calculateTotalDiseased() {
+       // Используем точное имя из маппинга бэкенда
+       const healthyName = "Здоровое яблоко";
+      return (stats) => {
+        return Object.entries(stats).reduce((total, [diagnosis, count]) => {
+          // Суммируем все, кроме здоровых и ошибок/ненайденных
+          if (diagnosis !== healthyName && diagnosis !== 'Ошибка анализа' && diagnosis !== 'Файл не найден') {
+             return total + count;
+          }
+          return total;
+        }, 0);
+      };
+    }
+  },
+  created() {
+    this.loadFromLocalStorage();
+  },
+  methods: {
+     formatDiagnosisName(diagnosis) {
+      // Простая функция для форматирования ключей статистики
+      return diagnosis.replace(/_/g, ' ').replace(/ \([\w\s]+\)$/, ''); // Убираем ключ в скобках, если он есть
+    },
+    addGarden() {
+      const newGarden = {
+        id: Date.now(),
+        name: "Новый сад",
+        location: "Местоположение",
+        images: [],
+        stats: {}, // Статистика остается объектом для детальных данных
+        expanded: false,
+        saved: false,
+        isAnalyzing: false, // Добавлено состояние загрузки для сада
+      };
+      this.gardens.push(newGarden);
+      // Сохранение в LS происходит при нажатии "Сохранить"
+    },
+    saveGarden(id) {
+      const garden = this.gardens.find(g => g.id === id);
+      if (garden) {
+        garden.saved = true;
+        garden.expanded = true;
+        this.saveToLocalStorage();
+      }
+    },
+    deleteGarden(id) {
+      this.gardens = this.gardens.filter(g => g.id !== id);
+      this.selectedGardens = this.selectedGardens.filter(gId => gId !== id);
+      this.saveToLocalStorage();
+    },
+    deleteSelectedGardens() {
+      this.gardens = this.gardens.filter(g => !this.selectedGardens.includes(g.id));
+      this.selectedGardens = [];
+      this.saveToLocalStorage();
+    },
+    toggleGarden(id) {
+      const garden = this.gardens.find(g => g.id === id);
+      // Разворачивать/сворачивать можно только сохраненный и не анализируемый сад
+      if (garden && garden.saved && !garden.isAnalyzing) {
+        garden.expanded = !garden.expanded;
+      }
+    },
+    triggerFileInput(gardenId) {
+       const garden = this.gardens.find(g => g.id === gardenId);
+       if (garden && garden.isAnalyzing) return; // Не открывать диалог во время анализа
+
+       const fileInputRef = this.$refs['fileInput' + gardenId];
+       if (fileInputRef && fileInputRef[0]) {
+           fileInputRef[0].click();
+       } else {
+           console.error("Ref не найден для fileInput" + gardenId);
+       }
+    },
+    async uploadImages(event, gardenId) {
+      const files = event.target.files;
+      if (!files.length) return;
+
+      const garden = this.gardens.find(g => g.id === gardenId);
+      if (!garden || garden.isAnalyzing) return; // Не загружать во время анализа
+
+      const formData = new FormData();
+      formData.append("name", garden.name);
+      formData.append("location", garden.location);
+      for (const file of files) {
+        formData.append("images", file, file.name);
+      }
+
+       try {
+         const response = await fetch("https://unbearably-decorous-airedale.cloudpub.ru/gardens", {
+           method: "POST",
+           body: formData,
+         });
+
+         if (!response.ok) throw new Error(`Ошибка загрузки: ${response.statusText} (${response.status})`);
+
+         const data = await response.json();
+
+         const newImages = data.images.map(filename => ({
+           src: `https://unbearably-decorous-airedale.cloudpub.ru/images/${encodeURIComponent(filename)}`,
+           selected: false,
+         }));
+
+         garden.images = [...garden.images, ...newImages];
+         event.target.value = null;
+         this.saveToLocalStorage();
+       } catch (error) {
+         console.error("Ошибка при загрузке изображений:", error);
+         alert(`Не удалось загрузить изображения: ${error.message}`);
+       }
+    },
+    toggleSelection(image) {
+       const garden = this.gardens.find(g => g.images.some(img => img.src === image.src)); // Найдем сад по изображению
+       if (garden && garden.isAnalyzing) {
+            return;
+       }
+       image.selected = !image.selected;
+    },
+    async analyzeSelected(gardenId) {
+      const garden = this.gardens.find(g => g.id === gardenId);
+      if (!garden || garden.isAnalyzing) return;
+
+      const selectedImages = garden.images.filter(image => image.selected);
+      if (selectedImages.length === 0) {
+        alert("Пожалуйста, выберите хотя бы одно изображение для анализа!");
+        return;
+      }
+
+      garden.isAnalyzing = true;
+
+      const imageUrls = selectedImages.map(img => img.src);
+
+      try {
+        const response = await fetch("https://unbearably-decorous-airedale.cloudpub.ru/analyze-selected-images", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ images: imageUrls }),
+        });
+
+        if (!response.ok) {
+          // Попробуем получить текст ошибки от сервера
+          let errorText = `Ошибка ответа сервера: ${response.statusText} (${response.status})`;
+          try {
+              const errorData = await response.json();
+              if(errorData.detail) errorText += `\n${errorData.detail}`;
+          } catch (e) { /* не удалось распарсить json ошибки */ }
+          throw new Error(errorText);
+        }
+
+        const analysisResult = await response.json();
+        console.log("Результат анализа:", analysisResult);
+
+        // --- Обновление статистики сада ---
+        for (const [diagnosisKey, count] of Object.entries(analysisResult.stats)) {
+            const formattedDiagnosis = this.formatDiagnosisName(diagnosisKey); // Используем форматер
+            garden.stats[formattedDiagnosis] = (garden.stats[formattedDiagnosis] || 0) + count;
+        }
+
+        this.saveToLocalStorage();
+
+        selectedImages.forEach(img => img.selected = false);
+
+        // --- Формируем детальное сообщение для alert ---
+        let alertMessage = `Анализ ${selectedImages.length} изображений завершен:\n\n`;
+        if (Object.keys(analysisResult.stats).length > 0) {
+            for (const [diagnosisKey, count] of Object.entries(analysisResult.stats)) {
+                alertMessage += `- ${this.formatDiagnosisName(diagnosisKey)}: ${count}\n`; // Используем форматер
+            }
+        } else {
+            alertMessage += "Диагнозы не определены.\n";
+        }
+        alertMessage += "\nСтатистика сада обновлена.";
+
+        alert(alertMessage);
+
+      } catch (error) {
+        console.error("Ошибка при анализе выбранных изображений:", error);
+        alert(`Ошибка анализа: ${error.message}`);
+      } finally {
+        garden.isAnalyzing = false;
+      }
+    },
+    saveToLocalStorage() {
+      const gardensToSave = this.gardens.map(g => {
+           const { isAnalyzing, ...rest } = g;
+           return rest;
+      });
+      localStorage.setItem("gardens", JSON.stringify(gardensToSave));
+    },
+    loadFromLocalStorage() {
+      const savedGardens = localStorage.getItem("gardens");
+      if (savedGardens) {
+        const parsedGardens = JSON.parse(savedGardens);
+        this.gardens = parsedGardens.map(garden => ({
+          ...garden,
+          images: (garden.images || []).map(img => typeof img === 'string' ? { src: img, selected: false } : { ...img, selected: img.selected || false }),
+          stats: typeof garden.stats === 'object' && garden.stats !== null ? garden.stats : {},
+          expanded: garden.expanded || false,
+          saved: garden.saved || false,
+          isAnalyzing: false, // Всегда false при загрузке
+        }));
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.garden-page {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f8fffe 0%, #e8f5f2 100%);
+  padding: 2rem;
+}
+
+.garden-header {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.add-garden-btn, .delete-selected-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.add-garden-btn {
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  color: white;
+}
+
+.add-garden-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(87, 207, 167, 0.3);
+}
+
+.delete-selected-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-selected-btn:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+.delete-selected-btn:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.gardens-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.garden-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.garden-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.garden-card.selected {
+  border-color: #57cfa7;
+  box-shadow: 0 8px 25px rgba(87, 207, 167, 0.2);
+}
+
+.garden-card-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fffe;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.garden-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.garden-name-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.garden-name-input, .garden-location-input {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.garden-name-input {
+  font-weight: 700;
+  color: #2d3748;
+  font-size: 1.25rem;
+}
+
+.garden-location-input {
+  color: #718096;
+  font-size: 0.95rem;
+}
+
+.garden-name-input:focus, .garden-location-input:focus {
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(87, 207, 167, 0.1);
+}
+
+.garden-name-input:disabled, .garden-location-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.garden-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.unsaved {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.status-badge.saved {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.garden-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.select-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.select-checkbox input {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.select-checkbox .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #57cfa7;
+  border-radius: 4px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.select-checkbox input:checked + .checkmark {
+  background: #57cfa7;
+}
+
+.select-checkbox input:checked + .checkmark::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.delete-garden-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-garden-btn:hover:not(:disabled) {
+  background: #fef2f2;
+  color: #dc2626;
+  transform: scale(1.1);
+}
+
+.delete-garden-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.save-garden-btn {
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-garden-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(87, 207, 167, 0.3);
+}
+
+.save-garden-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-garden-btn {
+  background: transparent;
+  border: none;
+  color: #57cfa7;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-garden-btn:hover:not(:disabled) {
+  background: #f0fdf4;
+  transform: scale(1.1);
+}
+
+.toggle-garden-btn.rotated svg {
+  transform: rotate(180deg);
+}
+
+.toggle-garden-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.garden-card-content {
+  padding: 2rem;
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 0 0 16px 16px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #57cfa7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.upload-section {
+  margin-bottom: 2rem;
+}
+
+.upload-area {
+  border: 3px dashed #e2e8f0;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: #f8fffe;
+}
+
+.upload-area:hover {
+  border-color: #57cfa7;
+  background: #f0fdf4;
+}
+
+.upload-icon {
+  margin-bottom: 1rem;
+}
+
+.upload-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.upload-subtitle {
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.upload-btn {
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(87, 207, 167, 0.3);
+}
+
+.upload-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(87, 207, 167, 0.4);
+}
+
+.upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.images-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.image-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+}
+
+.image-item.selected {
+  box-shadow: 0 0 0 3px #57cfa7, 0 8px 25px rgba(87, 207, 167, 0.3);
+}
+
+.garden-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.garden-image.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.image-selection-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #57cfa7;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.analysis-section {
+  display: flex;
+  justify-content: center;
+}
+
+.analyze-btn {
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(87, 207, 167, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(87, 207, 167, 0.4);
+}
+
+.analyze-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.stats-section {
+  margin-top: 2rem;
+}
+
+.stats-card {
+  background: #f8fffe;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.stats-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.stat-value {
+  background: #57cfa7;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.summary-item.healthy {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.summary-item.diseased {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.summary-value {
+  background: currentColor;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.stats-empty {
+  text-align: center;
+  color: #718096;
+  padding: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: #718096;
+  padding: 3rem;
+  font-style: italic;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .garden-page {
+    padding: 1rem;
+  }
+  
+  .garden-header {
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .add-garden-btn, .delete-selected-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .garden-card-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .garden-info {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .garden-actions {
+    justify-content: center;
+  }
+  
+  .stats-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .garden-card-content {
+    padding: 1rem;
+  }
+  
+  .upload-area {
+    padding: 2rem 1rem;
+  }
+  
+  .image-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .garden-image {
+    height: 80px;
+  }
+}
+</style>

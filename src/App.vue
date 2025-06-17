@@ -2,6 +2,7 @@
 import HomePage from './components/HomePage.vue';
 import GardenPage from './components/GardenPage.vue';
 import ProfilePage from './components/ProfilePage.vue';
+import AboutPage from './components/AboutPage.vue';
 import axios from 'axios'; // Импортируем axios для запроса /users/me
 
 export default {
@@ -93,7 +94,7 @@ export default {
     <nav class="menu flex items-center text-xl ml-auto mt-4">
       <router-link to="/home">Главная</router-link>
       <router-link to="/garden" class="ml-8">Мой сад</router-link>
-      <router-link to="/profile" class="ml-8 mr-6">О нас</router-link>
+      <router-link to="/about" class="ml-8 mr-6">О нас</router-link>
     </nav>
 
     <div class="auth-buttons flex items-center mt-3 mb-3 ml-6 mr-6">

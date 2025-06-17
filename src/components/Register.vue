@@ -46,7 +46,7 @@
         isLoading: false,
         // Укажите базовый URL вашего FastAPI сервера
         // Лучше вынести в переменные окружения (.env)
-        apiBaseUrl: 'http://localhost:8000' // Замените на ваш URL, если отличается
+        apiBaseUrl: 'https://unbearably-decorous-airedale.cloudpub.ru' // Замените на ваш URL, если отличается
       };
     },
     methods: {

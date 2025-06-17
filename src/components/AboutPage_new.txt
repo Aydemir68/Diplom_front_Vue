@@ -1,0 +1,408 @@
+<template>
+  <div class="about-page">
+    <div class="about-container">
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <div class="hero-content">
+          <h1 class="hero-title">О проекте <span class="title-accent">AiCадовод</span></h1>
+          <p class="hero-subtitle">
+            Инновационный сервис для защиты растений с помощью искусственного интеллекта
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Description -->
+      <div class="description-section">
+        <div class="description-card">
+          <div class="description-content">
+            <h2 class="section-title">Наша миссия</h2>
+            <p class="description-text">
+              AiCадовод - это инновационный сервис, который помогает садоводам защищать свои растения с помощью искусственного интеллекта. 
+              Мы стремимся сделать уход за садом более эффективным и доступным для каждого.
+            </p>
+            <p class="description-text">
+              Наш сервис использует передовые технологии машинного обучения для анализа фотографий растений. 
+              Достаточно загрузить изображение, и наша система определит наличие заболеваний, поставит диагноз и 
+              предложит эффективные методы лечения и профилактики.
+            </p>
+            <div class="telegram-section">
+              <h3 class="telegram-title">Попробуйте наш Telegram-бот</h3>
+              <p class="telegram-description">
+                Для работы в полевых условиях также есть телеграм-бот AiСадовод
+              </p>
+              <a 
+                href="https://t.me/AiSadovod_bot" 
+                target="_blank" 
+                class="telegram-link"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                @AiSadovod_bot
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advantages Section -->
+      <div class="advantages-section">
+        <h2 class="section-title">Наши преимущества</h2>
+        <div class="advantages-grid">
+          <div class="advantage-card">
+            <div class="advantage-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 10V3L4 14H7V21L16 10H13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="advantage-title">Мгновенный анализ</h3>
+            <p class="advantage-description">
+              Получайте результаты анализа в течение нескольких секунд. Наша система работает быстро и эффективно.
+            </p>
+          </div>
+
+          <div class="advantage-card">
+            <div class="advantage-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="advantage-title">Точность диагноза</h3>
+            <p class="advantage-description">
+              Высокая точность определения заболеваний благодаря современным алгоритмам искусственного интеллекта.
+            </p>
+          </div>
+
+          <div class="advantage-card">
+            <div class="advantage-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.663 17H14.337M12 3V1M21 12H19M5 12H3M18.364 5.636L16.95 4.222M7.05 4.222L5.636 5.636M18.364 18.364L16.95 19.778M7.05 19.778L5.636 18.364M12 23V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 class="advantage-title">Экспертные рекомендации</h3>
+            <p class="advantage-description">
+              Профессиональные советы по лечению и профилактике заболеваний растений от экспертов.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technology Section -->
+      <div class="technology-section">
+        <div class="technology-card">
+          <div class="technology-content">
+            <h2 class="section-title">Технологии</h2>
+            <div class="technology-grid">
+              <div class="tech-item">
+                <div class="tech-icon">🤖</div>
+                <h4>Искусственный интеллект</h4>
+                <p>Передовые алгоритмы машинного обучения</p>
+              </div>
+              <div class="tech-item">
+                <div class="tech-icon">📱</div>
+                <h4>Мобильные технологии</h4>
+                <p>Доступность через веб и Telegram</p>
+              </div>
+              <div class="tech-item">
+                <div class="tech-icon">🔬</div>
+                <h4>Компьютерное зрение</h4>
+                <p>Анализ изображений растений</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'AboutPage'
+}
+</script>
+
+<style scoped>
+.about-page {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f8fffe 0%, #e8f5f2 100%);
+  padding: 2rem 0;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 3rem 0;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+
+.title-accent {
+  color: #57cfa7;
+  position: relative;
+}
+
+.title-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #57cfa7, #4fc29b);
+  border-radius: 2px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.description-section {
+  margin-bottom: 4rem;
+}
+
+.description-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+.description-text {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+}
+
+.telegram-section {
+  background: linear-gradient(135deg, #f0fdf4, #e8f5f2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid #57cfa7;
+}
+
+.telegram-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.telegram-description {
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.telegram-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(87, 207, 167, 0.3);
+}
+
+.telegram-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(87, 207, 167, 0.4);
+}
+
+.advantages-section {
+  margin-bottom: 4rem;
+}
+
+.advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.advantage-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.advantage-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(87, 207, 167, 0.15);
+  border-color: #57cfa7;
+}
+
+.advantage-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #57cfa7, #4fc29b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+}
+
+.advantage-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.advantage-description {
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.technology-section {
+  margin-bottom: 2rem;
+}
+
+.technology-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.technology-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.tech-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f8fffe;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.tech-item:hover {
+  background: #f0fdf4;
+  border-color: #57cfa7;
+  transform: translateY(-2px);
+}
+
+.tech-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.tech-item h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.tech-item p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-container {
+    padding: 0 1rem;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .description-card,
+  .technology-card {
+    padding: 2rem;
+  }
+  
+  .advantages-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .technology-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .telegram-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .description-card,
+  .technology-card {
+    padding: 1.5rem;
+  }
+  
+  .advantage-card {
+    padding: 1.5rem;
+  }
+  
+  .advantage-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .tech-icon {
+    font-size: 2.5rem;
+  }
+}
+</style>

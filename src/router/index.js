@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../components/HomePage.vue';
 import GardenPage from '../components/GardenPage.vue';
 import ProfilePage from '../components/ProfilePage.vue';
+import AboutPage from '../components/AboutPage.vue';
 import Register from '../components/Register.vue'; // Импорт компонента
 import Login from '../components/Login.vue';     // Импорт компонента
 
@@ -42,6 +43,11 @@ const routes = [
     // Правильнее использовать provide/inject или state management (Pinia/Vuex).
     // В нашем случае Login сам вызовет onLoginSuccess, который был передан в <RouterView>
     // props: true // Эта строка здесь не нужна для передачи функции из App.vue
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: AboutPage
   }
   // Другие ваши маршруты...
 ];

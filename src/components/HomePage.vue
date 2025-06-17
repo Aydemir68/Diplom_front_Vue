@@ -8,7 +8,14 @@
            Отправьте данные об изображении и получите прогнозы и советы по защите своего сада на новом уровне.
          </p>
 
-         <div class="upload-section border-dashed border-2 border-gray-300 border-round-2xl p-6 text-center">
+         <div 
+           class="upload-section border-dashed border-2 border-gray-300 border-round-2xl p-6 text-center"
+           @drop="handleDrop"
+           @dragover="handleDragOver"
+           @dragenter="handleDragEnter"
+           @dragleave="handleDragLeave"
+           :class="{ 'drag-over': isDragOver }"
+         >
            <p class="text-gray-500 text-xl mb-4 mt-8">Перетащите изображение</p>
            <input
              type="file"
@@ -22,7 +29,6 @@
          </div>
        </div>
 
-       <!-- Image Section -->
        <div class="image-section flex-1 flex flex-col items-center">
          <div v-if="imageUrl" class="image-wrapper relative">
            <img :src="imageUrl" alt="uploaded_image" class="upload-image border-round-2xl" />
@@ -50,6 +56,7 @@ export default {
      imageUrl: null,
      result: null,
      loading: false,
+     isDragOver: false,
    };
  },
  methods: {
@@ -67,7 +74,7 @@ export default {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch("https://unbearably-decorous-airedale.cloudpub.ru/predict", {
         method: "POST",
         body: formData,
       });
@@ -89,6 +96,26 @@ export default {
       this.loading = false;
     }
   }
+  },
+  handleDrop(event) {
+    event.preventDefault();
+    this.isDragOver = false;
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      this.handleFileUpload({ target: { files: [file] } });
+    }
+  },
+  handleDragOver(event) {
+    event.preventDefault();
+    this.isDragOver = true;
+  },
+  handleDragEnter(event) {
+    event.preventDefault();
+    this.isDragOver = true;
+  },
+  handleDragLeave(event) {
+    event.preventDefault();
+    this.isDragOver = false;
   },
  },
 };
@@ -130,6 +157,11 @@ button:hover {
 
 .upload-section {
  height: 30rem;
+}
+
+.upload-section.drag-over {
+ border-color: #57cfa7;
+ background-color: rgba(87, 207, 167, 0.1);
 }
 
 .loading-overlay {
